@@ -48,7 +48,11 @@ Objectif : verrouiller la chaîne paiement/billets (webhooks, idempotence, anti-
 ## 1) Cadre & objectifs (0:00–0:05)
 ### Questions d’ouverture
 - Quelles sont les 3 décisions qui, si on ne les prend pas, bloquent le dev cette semaine ?
+  
+  **Réponses** : Choix des techno orientées Afrique ?
 - Qu’est-ce qu’on veut absolument avoir tranché à la fin de cette heure ?
+  
+  **Réponses** : Choix de techno qui s'oriente sur la vitesse de connexion en fonction des contraintes réseaux
 
 ### Recommandation
 - On sort avec des décisions “suffisamment bonnes” et un plan d’action, plutôt qu’un débat parfait.
@@ -59,44 +63,71 @@ Objectif : verrouiller la chaîne paiement/billets (webhooks, idempotence, anti-
 
 ### Points à challenger techniquement
 - **Besoin natif immédiat ?**
-  - caméra pour scan QR
+  - caméra pour scan QR (côté Organisateur)
+ 
+    **Réponses** : Oui, c'est un facteur différenciant. Possible via module intégré à l'app mais à tester correctement pendant uat
   - offline à l’entrée
+ 
+    **Réponses** : Faire des recherches compémentaires pour savoir comment sa fonctionne ? (Samba)
   - notifications push
+ 
+    **Réponses** : Oui
   - wallet / pass
+ 
+    **Réponses** : Peut venir après, pas nécessaire pour une v0. **Nice to have**. Recherche sur l'API OS
 - **Acquisition & vitesse** : web/PWA = plus rapide à livrer et à diffuser.
 - **Risque** : 2 apps (iOS/Android) + web = charge forte au début.
 
+  **Réponses** : Possibilité de passer sur Flutter pour faire trois en même temps. Mais pour une vO privilégier web/PWA.
+
 ### Questions techniques
 - Est-ce que le scan QR doit marcher **même sans réseau** ?
+
+  **Réponses** : oui. Faire des recherches complémentaires (Samba)
 - Est-ce qu’on veut une app séparée “Scanner/Organisateur” ?
+
+  **Réponses** : Oui un module différent (user/organisateur). Comme ça les organisateurs pourront avoior un module scan
 - Notre V0 a-t-elle besoin de push notifications ou on peut démarrer par email/WhatsApp ?
+
+  **Réponses** : Partir sur un usage email/whatsapp pour une v0. (On pourra réfléchir au Push notification plus tard. On le met de côté d'abord car les utilisateurs spécalement en Afrique ont l'habitude de couper leur notification push pour réduire les data consommés.)
 
 ### Recommandation (proposée)
 - **V0/V1 : Web responsive + PWA**
-- **V1.5 : mini app “Scanner” dédiée organisateurs** (React Native Expo) si le scan web montre des limites.
+- **V0 : mini app “Scanner” dédiée organisateurs** (React Native Expo) si le scan web montre des limites --> mais dernier sprint
 - On garde la possibilité “Mobile grand public” plus tard, quand on a validé usage & acquisition.
-
-### Décision à prendre ce soir
-- [ ] V0 = Web/PWA uniquement
-- [ ] V0 = Web + app Scanner
-- [ ] V0 = Web + mobile grand public (rarement optimal)
 
 ---
 
 ## 3) Backend & données : comment on structure le cœur du produit ? (0:20–0:40)
 
 ### Ce qu’on sait déjà (du backlog)
-- Nous visons un MVP avec : liste events, panier, paiement (webhooks), QR, email, compte OTP, historique billets.
+- Nous visons un MVP avec : liste events, panier, paiement (webhooks), QR (potentiel dans la v0), email et Whatsapp, compte OTP (Dans une v0 mais garder le volet qu'on impose rien mais on propose. A tester réellement en fonction des problèmes de connexions (point de vigilance bug), historique billets.
 - Les flux paiement/billet sont **critiques** : ils imposent un backend métier.
+
+  **Réponses** : Rester sur un backend naztif et controlé (voir si besoin d'encryptation : Elvis) 
 
 ### Modules backend (monolithe modulaire recommandé)
 - Auth & Users
+
+  **Réponses** Voir si on peut mettre la double authentification pour les users et les organisateurs mais le garder non obligatoire pour les users
 - Events
+
+  **Réponses** : Garder postgres pour garder le control et pouvoir s'intégreer facilement avec le reste
 - Ticketing (ticket types, capacité, règles)
+
+  **Réponses** : BD postgres
 - Orders & Payments (state machine)
+
+  **Réponses** : BD postgres mais aussi intégrateur API (Fedapay pour une v0 et regarder sur Paypal et ApplePay pour une v1 : Voir avec Adelphe)
 - Ticket Issuance (QR, email)
+
+  **Réponses** : générer par back end, enrégistrer dans DB et pour les email mettre en place un serveur SMTP
 - Check-in (validation QR, anti-duplication)
+
+  **Réponses** : BD postgres et module personalisé de lecture de nos code QR généré
 - Notifications
+
+  **Réponses** : API whatsapp
 - Admin/Moderation
 
 ### Questions techniques (challenge)
@@ -105,8 +136,14 @@ Objectif : verrouiller la chaîne paiement/billets (webhooks, idempotence, anti-
   - annulation / remboursement
   - transfert de billet
 - Est-ce qu’on autorise l’achat sans compte (guest checkout) ?
+
+  **Réponses** : Nous voulons construire une communauté et gagner grace a de la fidélisation plutot que privilégier l'argent gagné sur de la venteb à l'intré des billets de la part d'inconnu.
 - Notre modèle de données minimal ressemble à quoi ?
   - Event, Venue, Category, TicketType, Order, PaymentTransaction, Ticket, CheckIn
+ 
+___
+
+
 
 ### Directus / n8n / Python — comment on les utilise (sans se piéger)
 #### Directus
