@@ -152,6 +152,7 @@ ___
 
 ✅ Recommandation  
 - On utilise **Directus comme CMS/admin** branché à PostgreSQL pour gagner du temps (création events, modération).
+  **Reponse** : On va prendre cette solution car il semble facile a déployé
 - On garde un **backend applicatif** pour le transactionnel.
 
 #### n8n
@@ -174,6 +175,7 @@ ___
 - [ ] DB : PostgreSQL
 - [ ] Admin : Directus oui/non
 - [ ] Jobs async : Redis + worker oui/non (recommandé)
+**Reponse** : On part sur une suite Postgres Directus et Python pour gérer le back
 
 ---
 
@@ -197,22 +199,21 @@ Mettre en place un setup **simple, stable et répétable** pour DEV + STAGING, e
 - **V0/MVP : PaaS ou VPS + Docker Compose**
 - **Pas de Kubernetes** en V0 (on y revient quand on a de la charge et des besoins HA/scaling).
 
+  **Reponse** : Privilégier des solutions cloud local ? A voir : Samba
+
 ### Environnements (définitions)
 - DEV : local (compose), sandbox paiement
-- STAGING : intégration (auto deploy), sandbox paiement
-- RAT : recette “comme prod”, validation fonctionnelle avant prod
+- STAGING : intégration (auto deploy), sandbox paiement 
 - PROD : vraies clés paiement, monitoring + backups
 
-### Questions techniques
-- Qui déploie ? (CI/CD automatisé ou manuel)
-- Quels domaines ? (`api-staging`, `api-rat`, `api`)
-- Comment on gère secrets & clés (env vars) ?
-- Où sont les backups Postgres ? (automatiques + test restore)
+  **Reponse** : Mettre en place par Elvis
 
-✅ Recommandation (ordre)
-- Sprint 1 : DEV + STAGING
-- Sprint 3 : ajouter RAT (avant vraie mise en prod paiement)
-- PROD : uniquement quand checklist “GO PROD” est prête
+### Questions techniques
+- Qui déploie ? (CI/CD automatisé ou manuel) : Elvis
+- Quels domaines ? : dev, uat, oat, prod
+- Comment on gère secrets & clés (env vars) ? : var d'environnements
+- Où sont les backups Postgres ? (automatiques + test restore): A voir pour la recette mais pas besoin en dev. 
+
 
 ### Décisions à prendre ce soir
 - [ ] PaaS (Railway/Render/Fly) OU VPS Docker Compose
