@@ -25,12 +25,12 @@ Definir l architecture technique cible V0 pour garantir:
 - Emission billet QR apres confirmation serveur paiement.
 - Envoi billet par email et WhatsApp.
 - Check-in organisateur avec anti-fraude.
-- Environnements DEV/STAGING/RAT/PROD.
+- Environnements DEV/STAGING/PRE-PROD/PROD.
 
 ## 2.3 Hors perimetre V0
 - Application mobile grand public dediee.
 - Wallet pass iOS/Android.
-- Multi-provider paiement en production.
+- Multi-provider paiement en production (plusieurs optiosn ennplus d'un intégrateur tiers. Ex : CB, Paypal, Apple pay ...).
 - IA/recommandation avancee.
 - Architecture HA multi-region.
 
@@ -39,7 +39,7 @@ Definir l architecture technique cible V0 pour garantir:
 | ID | Exigence | Critere d acceptance |
 |---|---|---|
 | EF-01 | Consulter liste et details des evenements | Listing filtre + detail event disponibles |
-| EF-02 | Creer un compte et se connecter via OTP | OTP valide, session ouverte, role applique |
+| EF-02 | Creer un compte et se connecter via Login,MDP (OTP) | OTP valide, session ouverte, role applique |
 | EF-03 | Passer une commande et payer | Commande tracee avec statut coherent |
 | EF-04 | Emettre un billet apres paiement confirme | Billet unique genere apres webhook valide |
 | EF-05 | Envoyer le billet au client | Email/WhatsApp envoyes avec suivi statut |
@@ -73,7 +73,7 @@ Definir l architecture technique cible V0 pour garantir:
 | ADR-07 | Sentry + logs centralises + uptime | Retenue | Detection rapide des incidents |
 | ADR-08 | Hebergement V0 PaaS vs VPS | A arbitrer | Compromis vitesse de mise en place vs controle cout |
 | ADR-09 | Worker Python Celery vs RQ | A arbitrer | Complexite/robustesse du traitement async |
-| ADR-10 | Scan offline (degre V0) | A arbitrer | Risque produit terrain vs complexite technique |
+| ADR-10 | Scan (V0) et extension hors ligne ready to test | A arbitrer | Risque produit terrain vs complexite technique |
 
 ## 5. Architecture cible V0
 ## 5.1 Vue logique des composants
