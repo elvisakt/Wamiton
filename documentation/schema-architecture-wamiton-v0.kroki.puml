@@ -1,0 +1,150 @@
+@startuml
+' Kroki / PlantUML - Architecture Wamiton v0
+' Render example:
+' https://kroki.io/plantuml/svg/<encoded-diagram>
+
+title Wamiton v0 - Schema d'architecture cible
+caption Backend Django unique, 3 surfaces web/PWA, PostgreSQL source de verite, workers async pour les flux critiques.
+
+skinparam backgroundColor #FAFAF7
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam defaultTextAlignment center
+skinparam ArrowColor #2F3437
+skinparam ArrowThickness 1.2
+
+skinparam rectangle {
+  BorderColor #2F3437
+  BackgroundColor #FFFFFF
+}
+
+skinparam component {
+  BorderColor #2F3437
+  BackgroundColor #FFFFFF
+}
+
+skinparam database {
+  BorderColor #2F3437
+  BackgroundColor #FFF7D6
+}
+
+skinparam queue {
+  BorderColor #2F3437
+  BackgroundColor #E8F4FF
+}
+
+skinparam cloud {
+  BorderColor #2F3437
+  BackgroundColor #F2F2F2
+}
+
+actor "Acheteur" as buyer
+actor "Organisateur" as organizer
+actor "Agent de controle" as agent
+actor "Admin Wamiton" as admin
+
+rectangle "Surfaces web / PWA" as surfaces #EAF6EF {
+  component "Surface A\nPWA Acheteur\nwamiton.bj" as pwa_buyer
+  component "Surface B\nDashboard Organisateur\nwamiton.pro.bj" as dashboard
+  component "Surface C\nPWA Check-in\ncheckin.wamiton.bj" as checkin
+}
+
+rectangle "Backend applicatif" as backend_zone #EDF2FF {
+  component "Django API\nDjango REST Framework\nAuth, permissions, API" as django_api
+  component "Django Admin\nBackoffice interne V0" as django_admin
+  component "Domaine metier\nState machines\nQuotas, billets, check-in" as domain
+  queue "Redis\nBroker + cache court" as redis
+  component "Workers async\nCelery/RQ\nEmission, PDF, notifications,\nrefunds, payouts" as workers
+}
+
+database "PostgreSQL\nSource de verite\nTransactions + audit" as postgres
+
+rectangle "Stockage fichiers" as storage_zone #FFF3E8 {
+  database "Object Storage\nImages, logos,\nPDF billets" as object_storage
+}
+
+rectangle "Integrations externes" as ext_zone #F4ECFF {
+  cloud "Agregateur paiement\nMTN MoMo, Moov,\ncarte, refunds, payouts" as payment
+  cloud "Email SMTP" as smtp
+  cloud "WhatsApp API" as whatsapp
+  cloud "SMS provider\noption V0" as sms
+}
+
+rectangle "Observabilite" as obs_zone #FFECEC {
+  component "Sentry\nErreurs front/back" as sentry
+  component "Logs structures\ntrace_id, order_ref,\nevent_id" as logs
+  component "Uptime + alerting\nAPI, jobs, webhooks,\ncheck-in sync" as uptime
+}
+
+component "Directus\nOption apres V0\nBackoffice interne uniquement" as directus #F3F3F3
+
+buyer --> pwa_buyer : decouvre,\nachète,\nconsulte billets
+organizer --> dashboard : cree events,\nsuit ventes,\ngere agents
+agent --> checkin : scanne QR,\nsynchronise offline
+admin --> django_admin : moderation,\nsupport,\noperations
+
+pwa_buyer --> django_api : HTTPS API
+dashboard --> django_api : HTTPS API
+checkin --> django_api : HTTPS API online
+checkin ..> checkin : cache local\nliste billets + scans offline
+
+django_admin --> django_api : actions internes
+django_api --> domain : orchestre\nuse cases critiques
+domain --> postgres : transactions\nidempotence\naudit
+django_api --> postgres : lectures/ecritures
+
+django_api --> redis : enqueue jobs
+workers --> redis : consume jobs
+workers --> postgres : maj statuts\nbillets, refunds,\npayouts
+workers --> object_storage : genere/stocke\nPDF billets
+django_api --> object_storage : medias events,\nlogos, PDF
+
+django_api --> payment : init paiement\nrefunds/payouts
+payment --> django_api : webhooks signes
+workers --> smtp : emails transactionnels
+workers --> whatsapp : billets + alertes
+workers --> sms : changements critiques event
+
+django_api --> sentry : erreurs backend
+pwa_buyer --> sentry : erreurs frontend
+dashboard --> sentry : erreurs frontend
+checkin --> sentry : erreurs frontend
+django_api --> logs : logs JSON
+workers --> logs : logs jobs
+uptime --> django_api : health checks
+
+directus ..> postgres : lecture/admin limitee
+directus ..> admin : usage interne si besoin
+
+note right of directus
+  Directus ne remplace pas Django.
+  Ne pas l'utiliser pour modifier:
+  orders, payments, tickets,
+  checkins, refunds, payouts.
+end note
+
+note bottom of backend_zone
+  V0 recommandee:
+  Docker Compose local + PaaS/VPS en staging/prod.
+  Kubernetes hors scope V0, a reconsiderer
+  seulement avec besoin de scaling/HA.
+end note
+
+note bottom of checkin
+  Offline check-in:
+  synchronisation avant evenement,
+  validation locale,
+  resolution conflit au retour reseau.
+end note
+
+legend right
+  |= Couleur |= Zone |
+  |<#EAF6EF>| Surfaces utilisateur |
+  |<#EDF2FF>| Backend Django |
+  |<#FFF3E8>| Stockage fichiers |
+  |<#F4ECFF>| Services externes |
+  |<#FFECEC>| Observabilite |
+endlegend
+
+@enduml

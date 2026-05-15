@@ -12,7 +12,7 @@ Il sert a:
 | Surface | Domaine | Usage | Cible |
 |---|---|---|---|
 | A - Acheteur | `wamiton.bj` | Decouverte, achat, billets, historique | PWA mobile-first |
-| B - Organisateur | `dashboard.wamiton.bj` | Events, ventes, reversements, agents | Web desktop |
+| B - Organisateur | `wamiton.pro.bj` | Events, ventes, reversements, agents | Web desktop |
 | C - Check-in | `checkin.wamiton.bj` | Scan QR, sync offline, entree terrain | PWA mobile ultra-simple |
 
 ## 3. Perimetre MVP
@@ -47,6 +47,8 @@ Il sert a:
 | Directus | Backoffice interne optionnel, pas dashboard organisateur principal | Optionnel apres V0 |
 
 ## 5. Architecture cible
+Schema dedie: [schema-architecture-wamiton-v0.kroki.puml](./schema-architecture-wamiton-v0.kroki.puml)
+
 | Composant | Responsabilite |
 |---|---|
 | PWA Acheteur | Catalogue, panier, paiement, billets, cache offline |

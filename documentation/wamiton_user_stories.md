@@ -36,7 +36,7 @@ Le produit Wamiton est compose de trois surfaces distinctes, toutes alimentees p
 **Surface A — Application acheteur** ([wamiton.bj](http://wamiton.bj))
 PWA mobile-first. Permet la decouverte des événements, l’achat de billets et la consultation des billets numeriques. C’est le produit grand public.
 
-**Surface B — Tableau de bord organisateur** ([dashboard.wamiton.bj](http://dashboard.wamiton.bj))
+**Surface B — Tableau de bord organisateur** ([wamiton.pro.bj](http://wamiton.pro.bj))
 Interface web, optimisee desktop. Permet la creation et la gestion des événements, le suivi des ventes et la gestion des reversements. Utilisee en amont de l’événement, dans un contexte bureautique.
 
 **Surface C — Application check-in** (checkin.wamiton.bj)
@@ -912,7 +912,7 @@ La sensibilité des informations reste à définir
 # Recapitulatif par priorite
 
 > Surface A : Application acheteur (wamiton.bj)
-Surface B : Tableau de bord organisateur (dashboard.wamiton.bj)
+Surface B : Tableau de bord organisateur (wamiton.pro.bj)
 Surface C : Application check-in (checkin.wamiton.bj)
 > 
 
