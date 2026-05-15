@@ -37,14 +37,14 @@ Il sert a:
 ## 4. Decisions techniques
 | Sujet | Decision v0 | Statut |
 |---|---|---|
-| Backend | Backend Django unique | A confirmer officiellement |
+| Backend | Backend Django unique | Retenu |
 | Base de donnees | PostgreSQL | Retenu |
 | Frontends | 3 surfaces web/PWA | Retenu |
 | Paiement | Agregateur couvrant MTN MoMo, Moov, refunds, payouts | A choisir |
 | Jobs async | Worker pour emission, PDF, notifications, remboursements | Retenu |
 | Stockage fichiers | Stockage objet pour images, logos, PDF billets | Recommande |
 | Observabilite | Sentry + logs structures + uptime | Retenu |
-| Directus | Backoffice interne optionnel, pas dashboard organisateur principal | A arbitrer |
+| Directus | Backoffice interne optionnel, pas dashboard organisateur principal | Optionnel apres V0 |
 
 ## 5. Architecture cible
 | Composant | Responsabilite |
@@ -111,6 +111,8 @@ Regle: aucun billet n'est emis sur simple retour front.
 
 ## 8. Regles techniques non negociables
 - `provider_tx_id`, `provider_event_id`, `order_ref`, `ticket_ref` doivent etre uniques.
+- Django est proprietaire de la logique metier critique: paiements, billets, cessions, refunds, payouts, check-in.
+- Directus ne doit pas modifier directement les tables transactionnelles critiques.
 - Les paiements, emissions, cessions, refunds et check-ins doivent etre idempotents.
 - Les quotas billets doivent etre proteges par transaction DB.
 - Un billet final ne peut avoir qu'un seul check-in valide cote serveur.
@@ -146,7 +148,7 @@ Regle: aucun billet n'est emis sur simple retour front.
 ## 12. Risques principaux
 | Risque | Mitigation |
 |---|---|
-| Django vs FastAPI non tranche | Arbitrer avant Sprint 0 et aligner PET/US |
+| Ajout premature de Directus | Complexite inutile en V0 | Demarrer avec Django Admin, ajouter Directus seulement si besoin backoffice interne |
 | Offline check-in multi-agents | Sync batch + resolution conflit + audit |
 | Emission differee ratee | Jobs supervises + alertes billets a emettre |
 | Double emission ou double entree | Idempotence + contraintes DB |
@@ -154,10 +156,9 @@ Regle: aucun billet n'est emis sur simple retour front.
 | Remboursements/reversements incomplets | Reconciliation provider quotidienne |
 
 ## 13. Points ouverts
-1. Confirmer backend Django unique ou reviser les user stories.
-2. Clarifier auth cible: email/mot de passe, telephone/mot de passe, OTP.
-3. Choisir l'agregateur paiement compatible MTN, Moov, carte, refunds, payouts.
-4. Definir le role exact de Directus.
-5. Decider stockage PDF: archive systematique ou generation a la demande.
-6. Definir les donnees autorisees dans les exports organisateur.
-7. Formaliser la strategie de conflit offline check-in.
+1. Clarifier auth cible: email/mot de passe, telephone/mot de passe, OTP.
+2. Choisir l'agregateur paiement compatible MTN, Moov, carte, refunds, payouts.
+3. Decider si Directus est utile apres V0 pour le backoffice interne Wamiton.
+4. Decider stockage PDF: archive systematique ou generation a la demande.
+5. Definir les donnees autorisees dans les exports organisateur.
+6. Formaliser la strategie de conflit offline check-in.
